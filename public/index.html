@@ -5,17 +5,33 @@
   <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font: 13px Helvetica, Arial; }
+  #dragme {
+    background: red;
+    position: relative;
+    width: 200px;
+    height: 100px;
+    color: white;
+  }
   </style>
   <script src="fingerprint/fingerprint.js" charset="utf-8"></script>
+  <script src="draggabilly/dist/draggabilly.pkgd.min.js" charset="utf-8"></script>
 </head>
 <body>
+  <p id="fingerprint"></p>
   <h1 id="index"></h1>
   <p id="viewport"></p>
+
+  <div id="dragme">
+    Hello
+  </div>
+
   <script src="/socket.io/socket.io.js"></script>
   <script>
   var fingerprint = new Fingerprint().get();
-  console.log(fingerprint);
+  document.getElementById("fingerprint").innerHTML = fingerprint;
+
   var socket = io();
+
   var getWidth = function() {
     return document.documentElement.clientWidth;
   };
@@ -27,14 +43,48 @@
     socket.emit('viewport', {"width": getWidth(), "height": getHeight() });
   };
 
+  onDragMove = function(elem, event, pointer) {
+    if(elem.position.x < 0 || (elem.position.x + elem.element.offsetWidth) > getWidth()) {
+      elem.position.xOffset = (elem.position.x + elem.element.offsetWidth) - getWidth()
+      socket.emit('position', elem.position);
+    }
+  };
+
   sendViewport();
+  var dragme = document.querySelector('#dragme');
+  var draggie = new Draggabilly(dragme);
+
+  // bind event listener
+  draggie.on( 'dragMove', onDragMove );
+  // un-bind event listener
+  // draggie.off( 'dragMove', onDragMove );
 
   window.addEventListener('resize', function(e){
     sendViewport();
   }, true);
+
   socket.on('index', function(index){
     document.getElementById("index").innerHTML = index;
   });
+
+  socket.on('position', function(position){
+
+    var elem = document.getElementById('dragme');
+
+    if(position.x < 0) {
+      var x = getWidth() + position.x;
+      var y = position.y;
+    } else {
+      var y = position.y;
+      var x = 0 - (200 - position.xOffset);
+    }
+
+    elem.style.position = 'relative';
+    elem.style.top = y+"px";
+    elem.style.left = x+"px";
+
+  });
+
   </script>
 </body>
 </html>

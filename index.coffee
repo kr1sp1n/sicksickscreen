@@ -5,6 +5,8 @@ app = express()
 http = require('http').Server(app)
 io = require('socket.io')(http)
 
+port = process.env.PORT or 3000
+
 app.use express.static("#{__dirname}/public")
 app.use express.static("#{__dirname}/bower_components")
 
@@ -29,9 +31,24 @@ io.on 'connection', (socket)->
   socket.index = getIndex 1
   console.log "client #{socket.index} connected"
   socket.emit 'index', socket.index
+
+  socket.on 'position', (position)->
+    from_index = socket.index
+    receiver = null
+    if from_index == 1
+      to_index = Object.keys(clients).length
+    else
+      to_index = from_index - 1
+
+    for id, client of clients
+      if client.index == to_index
+        socket.to(client.id).emit('position', position)
+        break
+
+
   socket.on 'disconnect', ->
     console.log "client #{socket.index} disconnected"
     delete clients[socket.id]
 
-http.listen 3000, ->
-  console.log 'listening on *:3000'
+http.listen port, ->
+  console.log "listening on *:#{port}"

@@ -1,0 +1,26 @@
+{
+  "name": "sicksickscreen",
+  "version": "0.0.1",
+  "homepage": "https://github.com/kr1sp1n/sicksickscreen",
+  "authors": [
+    "kr1sp1n <krispinone@googlemail.com>"
+  ],
+  "description": "multiscreen via websockets",
+  "main": "index.coffee",
+  "keywords": [
+    "socket"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "fingerprint": "~0.5.4",
+    "draggabilly": "~1.1.1"
+  }
+}
