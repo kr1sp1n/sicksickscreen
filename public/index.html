@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <title>Socket.IO chat</title>
+  <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font: 13px Helvetica, Arial; }
+  </style>
+  <script src="fingerprint/fingerprint.js" charset="utf-8"></script>
+</head>
+<body>
+  <h1 id="index"></h1>
+  <p id="viewport"></p>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+  var fingerprint = new Fingerprint().get();
+  console.log(fingerprint);
+  var socket = io();
+  var getWidth = function() {
+    return document.documentElement.clientWidth;
+  };
+  var getHeight = function() {
+    return document.documentElement.clientHeight;
+  };
+  sendViewport = function() {
+    document.getElementById("viewport").innerHTML = getWidth()+'x'+getHeight();
+    socket.emit('viewport', {"width": getWidth(), "height": getHeight() });
+  };
+
+  sendViewport();
+
+  window.addEventListener('resize', function(e){
+    sendViewport();
+  }, true);
+  socket.on('index', function(index){
+    document.getElementById("index").innerHTML = index;
+  });
+  </script>
+</body>
+</html>
